@@ -1,0 +1,97 @@
+<meta charset="utf-8">
+<style>
+body{
+	margin:0;
+}
+li{
+  list-style-type:none;
+  cursor:pointer;
+}	
+.app{
+  color:#C6E2FF;
+  background:url(img/scene.jpg) no-repeat;
+  background-size:100% 100%;
+}
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.perform{
+	width:100%;
+	height:100%;
+}
+.article{
+	display:flex;
+}	
+.left{
+  width:10%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:space-around;
+  overflow:auto;
+} 
+.right{
+	width:50%;
+	margin-left:15%;
+	flex-direction:column;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:#EEE0E5;
+}
+#yulu{
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+}		
+.yulu{
+	height:50%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	flex-wrap:wrap;
+	color:#EEE0E5;
+}
+ .creat{
+	display:flex;
+}		
+</style>
+<link rel='stylesheet' href='e.css' />
+<div class='app'>
+	<div class='header' v-on:click="article">
+		<li v-for="site in sites">
+		  {{ site}}
+		</li>
+	</div>
+	<div class='perform'>
+		<component v-bind:is="which_to_show"></component>
+	</div>
+</div>
+<script src=jq.js></script>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script>
+new Vue({
+  el: '.header',
+  data: {
+    sites: [
+      '文集','语录','创作'
+    ],
+	which_to_show:'article'
+  },
+  components:{
+	article:{
+		template:'<div class=article><div class=left></div><div class=right></div></div>'
+	},
+	second:{
+		template:'<div>这是子组件2<div>'
+	},
+	third:{
+		template:'<div>这是子组件3<div>'
+	},
+  }
+})
+</script>
+</body>
+</html>

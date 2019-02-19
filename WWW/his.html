@@ -1,0 +1,36 @@
+<meta charset='utf-8' />
+<style>
+li{list-style:none;cursor:pointer}
+
+</style>
+<div id='app'>
+</div>
+<meta charset="UTF-8" />
+<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+<script src=jq.js></script>
+<script>
+class Hello extends React.Component {
+ 
+  
+    state = {opacity: 1.0};
+  
+ 
+  componentDidMount() {
+    
+  }
+ 
+  render () {
+    return (
+      <div >
+        Hello 
+      </div>
+    );
+  }
+}	
+ReactDOM.render(
+  <Hello /> 
+  ,document.getElementById('app')
+)
+</script>

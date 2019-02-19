@@ -1,0 +1,28 @@
+.art{
+	flex-direction:column;
+	display:flex;
+	justify-content:space-around;
+	align-items:center;
+	width:100%;
+	color:#EEE0E5;
+}
+.sentence{
+	width:70%;
+}	
+.title{
+	width:20%;
+	border:1px solid;
+} 
+.content{
+	width:60%;
+	height:80%;
+	border:1px solid;
+	overflow:auto;
+}  
+.submit{
+	width:6%;
+	display:flex;
+	justify-content:center;
+	background:#8470FF;
+	cursor:pointer;	
+}

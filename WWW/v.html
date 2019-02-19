@@ -1,0 +1,141 @@
+﻿<meta charset=utf-8 />
+<style>
+body{
+	margin:0;
+}
+li{
+  list-style-type:none;
+  cursor:pointer;
+}	
+.app{
+  color:#C6E2FF;
+  background:url(img/scene.jpg) no-repeat;
+  background-size:100% 100%;
+}
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.perform{
+	width:100%;
+	height:100%;
+}
+.article{
+	display:flex;
+}	
+.left{
+  width:10%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:space-around;
+  overflow:auto;
+} 
+.right{
+	width:50%;
+	margin-left:15%;
+	flex-direction:column;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:#EEE0E5;
+}
+#yulu{
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+}		
+.yulu{
+	height:50%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	flex-wrap:wrap;
+	color:#EEE0E5;
+}
+ .creat{
+	display:flex;
+}		
+</style>
+<link rel='stylesheet' href='e.css' />
+<div class='app'>
+<div class='perform'>
+</div>
+</div>
+<script src=jq.js></script>
+<script>
+p=JSON.parse
+parse=data=>JSON.parse(data)[0][0]
+div=clas=>'<div class='+clas+'></div>'
+id=id=>'<div id='+id+'></div>'
+li=data=>data.map(l=>'<li>'+l+'</li>')
+li.p=data=>p(data).map(l=>'<li>'+l[0]+'</li>')
+input=(clas,data)=>!data ? '<input class='+clas+'></input>' : '<input class='+clas+' placeholder='+data+'></input>' 
+contenteditable=clas=>$(clas).attr('contenteditable','true')
+com=(clas,data,event)=>event ? $(clas).html(data).on('click','li',event) :$(clas).html(data)
+header=(data,event)=>com(div('header'),data,event)
+article=(data,event)=>com(div('article'),left(li.p(data),event)).append(right())
+left=(data,event)=>com(div('left'),data,event)
+right=data=>data ? com('.right',data) : com(div('right'))
+$('.app').prepend(header(li(['文集','语录','创作']),function(){
+	$(this).css({color:'white'}).siblings().css({color:''})
+	var html=$(this).html()
+	if(html=='文集') $.get('index.php?topic='+html,data=>{
+		$('.perform').html(article(data,function(){
+			var html=$(this).html()
+			title=html
+			$(this).css({color:'white'}).siblings().css({color:''})
+			$.get('index.php?title='+html,data=>right(parse(data)))
+		}))
+		if(typeof(title)=='undefined' ){
+			title=$('.left').children(':first').html()
+			$('.header').children(':first').css('color','white')
+			$('.left').children(':first').css('color','white') 
+		}else{
+			$('.left').children().each(function(){
+				$(this).html()==title? $(this).css('color','white')  : ''
+			})	
+		}
+		$.get('index.php?title='+title,data=>right(parse(data)))
+	})
+	if(html=='语录') $.get('index.php?topic='+html,data=>{
+		var juzi=''
+		JSON.parse(data).map(function(l){
+			for(i=0;i<l.sentence.length;i++) juzi+='<li>'+l.sentence[i]+'</li>'
+		})
+		$('.perform').html($(id('yulu')).html(com(div('yulu'),juzi)))
+	})	
+	if(html=='创作'){
+		art=com(div('art'),input('sentence','语录'))
+		.append(contenteditable(div('title')))
+		.append(contenteditable(div('content')))
+		.append(com(div('submit'),'<li>发表</li>',function(){
+			console.log($('.title').html())
+			//left_data.push($('.title').html())
+		}))
+		creat=(data,event)=>com(div('creat'),left(li.p(data),event)).append(art)
+		$.get('index.php?topic='+$('.header').children(':first').html(),data=>{
+			$('.perform').html(creat(data,function(){
+				var html=$(this).html()
+				creat_title=html
+				com('.title',html)
+				$(this).css({color:'white'}).siblings().css({color:''})
+				$.get('index.php?title='+html,data=>com('.content',parse(data)))
+			}))
+			if(typeof(creat_title)=='undefined' ){
+				creat_title=$('.left').children(':first').html()
+				$('.left').children(':first').css('color','white') 
+			}else{
+				$('.left').children().each(function(){
+					$(this).html()==creat_title? $(this).css('color','white')  : ''
+				})	
+			}
+			com('.title',creat_title)
+			$.get('index.php?title='+creat_title,data=>com('.content',parse(data)))
+		})
+	}		
+}))
+$('.header').children(':first').click()
+</script>
+

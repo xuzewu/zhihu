@@ -1,0 +1,55 @@
+<meta charset=utf-8 />
+<style>
+li{list-style:none;}
+.center{
+	flex-direction:column;
+	height:100%;
+	display:flex;
+	justify-content:space-around;
+	align-items:center;
+}	
+.center a{
+	margin-left:50px;
+	margin-right:50px;
+	cursor:pointer;
+}	
+</style>
+<div class=center>	
+	
+</div>
+<script src=jq.js></script>
+<script>
+$.get('question.php?index=1',d=>{
+	console.log(d)
+	d=JSON.parse(d)
+	str=''
+	for(i in d){
+		str+='<div id='+d[i].id+'><button class=update>编辑</button><a>'+d[i].question+'</a><button class=delete >删除</button></div>'
+	}
+	$('.center').html(str+'<div class=insert><input /><button>提问</button></div>')	
+	$('.insert button').click(()=>{
+		val=$('.insert input').val()
+		if(val){
+			$('.insert input').val('')
+			$.post('question.php',{question:val},d=>
+			$('.center').prepend('<div id='+d+'><button class=update>编辑</button><a>'+val+'</a><button class=delete>删除</button></div>'))
+		}else{
+			alert('please write the question')
+		}	
+	})
+	$('.center').on('click','.delete',function(){
+		$.post('question.php',{id:$(this).parent().attr('id')},()=>{
+			$(this).parent().remove()
+		})	
+	})
+	$('.center').on('click','.update',function(){
+		if($(this).html()=='编辑'){ 
+			$(this).html('确认编辑').next().attr('contenteditable',true).focus()
+		}else{
+			$(this).html('编辑')
+			$(this).next().attr('contenteditable',false)
+			$.get('question.php',{question:$(this).next().html(),id:$(this).parent().attr('id')})
+		}	
+	})
+})
+</script>

@@ -1,0 +1,117 @@
+﻿<meta charset=utf-8 />
+<style>
+body{
+	margin:0;
+}
+li{
+  list-style-type:none;
+  cursor:pointer;
+}	
+.app{
+  color:#C6E2FF;
+  background:url(img/scene.jpg) no-repeat;
+  background-size:100% 100%;
+}
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.perform{
+	height:100%;
+}
+.article{
+	display:flex;
+}	
+.left{
+  width:10%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:space-around;
+  overflow:auto;
+}   
+.right{
+	width:50%;
+	margin-left:15%;
+	flex-direction:column;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:#EEE0E5;
+}	
+#yulu{
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+}	
+.yulu{
+	height:50%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	flex-wrap:wrap;
+}	
+</style>
+<link rel='stylesheet' href='creat.css' />
+<div class='app'>
+	<div class='header'>
+		<li>文集</li>
+		<li>语录</li>
+		<li>创作</li>
+	</div>
+	<div class='perform'>
+		<div class='article'>
+			<div class='left'>
+			</div>
+			<div class='right'>
+			</div>
+		</div>
+	</div>	
+</div>
+<script src=jq.js></script>
+<script>
+const article="<div class='article'><div class='left'></div><div class='right'></div></div>"
+const creat="<div class='art'><div class='sentence' contenteditable='true'>语录:</div><div class='title' contenteditable='true'></div><div class='content' contenteditable='true'></div><div class='submit'>发表</div></div>"
+$('.header li').click(function(){
+	$(this).css({color:'white'}).siblings().css({color:''})
+	const html=$(this).html()
+	if(html=='文集'){
+		$('.perform').html(article) 
+		$.get('index.php?topic='+html,data=>{
+			$('.left').html(JSON.parse(data).map(l=>'<li>'+l.title+'</li>')).children().click(function(){
+				$(this).css({color:'white'}).siblings().css({color:''})
+				$.get('index.php?title='+$(this).html(),data=>$('.right').html(JSON.parse(data)[0].content))
+			})
+			$.get('index.php?title='+$('.left').children(':first').html(),data=>$('.right').html(JSON.parse(data)[0].content))
+		})
+	}	
+	if(html=='语录'){
+		var yulu=''
+		$.get('index.php?topic='+html,data=>{
+			JSON.parse(data).map(function(l){
+				for(i=0;i<l.sentence.length;i++) yulu+='<li>'+l.sentence[i]+'</li>'
+			})
+			$('.perform').html('<div id=yulu><div class=yulu>'+yulu+'</div></div>')
+		})	
+	}	
+	if(html=='创作') {
+		$('.perform').html(creat) 
+		$('.submit').click(()=>{
+			console.log('abc')
+			$.post('index.php',{
+				sentence:$.trim($('.sentence').html()).split('语录:')[1],
+				title:$.trim($('.title').html()),
+				content:$('.content').html().replace(/div/g,'p')
+			})
+		})
+	}	
+})	
+$.get('index.php?topic='+$('.header').children(':first').html(),data=>{
+	$('.left').html(JSON.parse(data).map(l=>'<li>'+l.title+'</li>')).children().click(function(){
+		$(this).css({color:'white'}).siblings().css({color:''})
+		$.get('index.php?title='+$(this).html(),data=>$('.right').html(JSON.parse(data)[0].content))
+	}).children(':first').css('color','white')	
+	$.get('index.php?title='+$('.left').children(':first').html(),data=>$('.right').html(JSON.parse(data)[0].content))
+})	
+</script>

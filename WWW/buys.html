@@ -1,0 +1,41 @@
+<meta charset=utf-8 />
+<style>
+body{margin:0}
+span{display:inline-block;cursor:pointer}
+.form{height:100%;display:flex;flex-direction:column;justify-content:space-between;}
+.form div{margin-bottom:10;}
+.form div span{margin-right:10}
+.picture{height:200;width:200;background-size: cover;}
+input{border-radius:25px;}
+</style>
+<body>	
+<div class=form>
+	<div><span style='margin-right:100'>收货人:许泽武</span><span>15019760435</span></div>
+	<div><span>收货地址:广东省汕头市</span></div>
+	<div><span class=picture></span><span style='padding-left:50'>x1</span></div>
+	<div><span>运费:15</span></div>
+	<div>
+		<span style='margin-right:170' >合计:45</span><input type=button value='确认下单'  class=confirm />
+	</div>
+</div>	
+</body>
+<script src=jq.js></script>
+<script>
+$(document).ready(function(){
+	img=location.href.split('#')[1]
+	//alert(img)
+	$('.picture').css('background-image','url('+img+')')
+})	
+$('.confirm').click(function(){
+	$('input').each(function(){
+		!$(this).val() ? empty=true : ''
+	})
+	typeof(empty)=='undefined' ? location.href = 'index.html' : alert('不能留空')
+})	
+$('.index').click(function(){
+	location.href = 'index.html'
+})		
+$('.my').on('click',function(){
+	location.href = 'my.html'
+})	
+</script>

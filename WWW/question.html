@@ -1,0 +1,10 @@
+<meta charset=utf-8 />
+<a href='question.html?question=2' target="_blank">a</a>
+<script src=jq.js></script>
+<script>
+loc=location.href.split('?')[1]
+onload=()=>{
+	history.pushState('','',loc.replace('=','/'))
+	$.get('../router.php?table='+loc.split('=')[0]+'&id='+loc.split('=')[1],(data)=>console.log(data))
+}	
+</script>

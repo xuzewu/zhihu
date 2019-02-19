@@ -1,0 +1,179 @@
+<meta charset=utf-8 />
+<style>
+body{
+	margin:0;
+}
+li{
+  list-style-type:none;
+  cursor:pointer;
+}	
+.app{
+  color:#C6E2FF;
+  background:url(img/scene.jpg) no-repeat;
+  background-size:100% 100%;
+}
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.perform{
+	width:100%;
+	height:100%;
+}
+.article{
+	display:flex;
+}	
+.left{
+  width:10%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:space-around;
+  overflow:auto;
+} 
+.right{
+	width:50%;
+	margin-left:15%;
+	flex-direction:column;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:#EEE0E5;
+}
+#yulu{
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+}		
+.yulu{
+	height:50%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	flex-wrap:wrap;
+	color:#EEE0E5;
+}
+ .creat{
+	display:flex;
+}		
+</style>
+<link rel='stylesheet' href='crea.css' />
+<div class='app'>
+	<div class='header'>
+		<li>文集</li>
+		<li>语录</li>
+		<li>创作</li>
+	</div>
+	<div class='perform'>
+	</div>	
+</div>
+<script src=jq.js></script>
+<script>
+orign=(data,fun)=>JSON.parse(data).map(fun)
+base=data=>data.map(l=>'<li>'+l+'</li>')
+li=data=>orign(data,l=>'<li>'+l[0]+'</li>')
+div=clas=>'<div class='+clas+'></div>'
+div_id=id=>'<div id='+id+'></div>'
+right=function(data=''){
+	var html=div('right')
+	if(data) 
+		return $('.right').html(li(data))
+	else	
+		return html
+}
+left=function(data,fun){
+	var html=div('left')
+	return $(html).html(li(data)).on('click','li',fun)
+}
+article=function(data,fun){
+	var html=div('article')	
+	return $(html).html(left(data,fun)).append(right())
+}
+title=''
+creat_title=''
+function init(){
+	$.get('index.php?topic='+$('.header').children(':first').html(),data=>{
+		$('.perform').html(article(data,
+			function(){
+				title=$(this)
+				$(this).css({color:'white'}).siblings().css({color:''})
+				$.get('index.php?title='+$(this).html(),data=>right(data))
+			})
+		)
+		$('.header').children(':first').css('color','white')
+		if(!title){
+			$('.left').children(':first').css('color','white') 
+			$.get('index.php?title='+$('.left').children(':first').html(),data=>right(data))
+		}else{
+			$('.left').children().each(function(){
+				$(this).html()==title.html() ? $(this).css('color','white')  : ''
+			})	
+			$.get('index.php?title='+title.html(),data=>right(data))
+		}	
+	})
+		
+}
+init()	
+$('.header li').click(function(){
+	$(this).css({color:'white'}).siblings().css({color:''})
+	const html=$(this).html()
+	if(html=='文集'){
+		init()
+	}	
+	if(html=='语录'){
+		var juzi=''
+		const yulu=function(data){
+			var id=div_id('yulu')
+			var juzi=$(div('yulu')).html(data)
+			return $(id).html(juzi)
+		}
+		$.get('index.php?topic='+html,data=>{
+			JSON.parse(data).map(function(l){
+				for(i=0;i<l.sentence.length;i++) juzi+='<li>'+l.sentence[i]+'</li>'
+			})
+			$('.perform').html(yulu(juzi))
+		})	
+	}	
+	if(html=='创作') {
+		const submit=function(title,data){
+			if(data){
+				$('.title').html(title)
+				console.log(data)
+				$('.content').html(data[0].content)
+			}else{
+				var art=div('art')
+				var submit="<div class='sentence' contenteditable='true'>语录:</div><div class='title' contenteditable='true'></div><div class='content' contenteditable='true'></div><div class='submit'>发表</div>"
+				return $(art).html(submit).on('click','.submit',()=>{
+					console.log('abc')
+					$.post('index.php',{
+						sentence:$.trim($('.sentence').html()).split('语录:')[1],
+						title:$.trim($('.title').html()),
+						content:$('.content').html().replace(/div/g,'p')
+					})
+				})
+			}	
+		}	
+		const creat=function(data,fun){
+			var creat=div('creat')
+			return $(creat).html(left(data,fun)).append(submit())
+		}
+		$.get('index.php?topic='+$('.header').children(':first').html(),data=>{
+			$('.perform').html(creat(data,function(){
+				creat_title=$(this)
+				$(this).css({color:'white'}).siblings().css({color:''})
+				$.get('index.php?title='+$(this).html(),data=>submit($(this).html(),JSON.parse(data)))
+			}))
+			if(!creat_title){
+			$('.left').children(':first').css('color','white')
+			$.get('index.php?title='+$('.left').children(':first').html(),data=>submit($('.left').children(':first').html(),JSON.parse(data)))
+			}else{
+				$('.left').children().each(function(){
+					$(this).html()==creat_title.html() ? $(this).css('color','white')  : ''
+				})	
+				$.get('index.php?title='+creat_title.html(),data=>submit(creat_title.html(),JSON.parse(data)))
+			}	
+		})	
+	}	
+})
+</script>

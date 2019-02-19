@@ -1,0 +1,30 @@
+<meta charset=utf-8 />
+<style>
+body{margin:0}
+.icon{width:100%}
+li{list-style:none;margin-top:30}
+li span{padding-right:10}
+li input{height:30}
+.xuzhi{text-align:center}
+.button{display:flex;justify-content:space-around}
+</style>
+<img src='img/icon.png' class=icon />
+<li><span>姓名:</span><input /></li>
+<li><span>手机:</span><input /></li>
+<li><span>地址:</span><input /></li>
+<li><span>备注:</span><input /></li>
+<div class=button><img src='img/提交.png'  /><img src='img/取消.png'  /></div>
+<script src=jq.js></script>
+<script>
+'use strict'
+$('li span').each(function(){
+	$(this).next().width($('li').width()-$(this).width()-40)
+})
+function a(i){
+	setTimeout(()=>console.log(i),i)
+}	
+for(let i=1000;i<=7000;i+=3000){
+	setInterval(()=>console.log(i),i)
+}
+
+</script>

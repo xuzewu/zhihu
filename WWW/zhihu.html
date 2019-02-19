@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+<body>
+<div id='app'>
+</div>
+</body>
+<style>
+body,li{
+	margin:0;
+	list-style-type:none;
+	cursor:pointer;
+}
+.app{
+	height:100%;
+  margin:0 auto;
+}	
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.ask , .login , .list{
+	margin-top:5%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+.MyAnswer{
+	display:flex;
+	flex-direction:column;
+}	
+.list li , .MyAnswer li{
+	margin-bottom:20px;
+}	
+.ask input{
+	width:500px;
+}
+.answer , #ans{
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}	
+#answer{
+	border:1px solid;
+	width:500px;
+	height:500px;
+}	
+#ans li{
+	margin-top:20px;
+}	
+</style>
+<script src=jq.js></script>
+<script type="text/babel">
+const d=(className,data)=><div className={className}>{data}</div>
+const l=console.log
+const li=(data,event)=>data.map(l=><li onClick={event}>{l}</li>)
+const li_o=(data,event)=>data.map(l=><li onClick={event}>{l[0]}</li>)
+const li_p=(data,event)=>p(data).map(l=><li onClick={event}>{l[0]}</li>)
+const p=JSON.parse
+const parse=data=>JSON.parse(data)[0][0]
+class Login extends React.Component{
+	render() {
+		return (
+			<div className='login'>
+				<li>账户:<input className='count' /></li>
+				<li>密码:<input className='password' /></li>
+				<li><button onClick={this.props.login}>{this.props.value}</button></li>
+			</div>
+		)
+    }
+}
+class Ask extends React.Component{
+	ask=()=>{
+		if($('.ask input').val()[$('.ask input').val().length-1] != '？')
+			alert('请以中文问号结尾') 
+		else{		
+			$.post('question.php',{count:localStorage.count,question:$('.ask input').val()},data=>
+				data ? alert(data) : location.reload()
+			)			
+		}	
+	}	
+	render() {
+		return (
+			<div className='ask'>
+				<input />
+				<button onClick={this.ask}>提问</button>
+			</div>
+		)
+    }
+}
+class Mycollect extends React.Component{
+	state={MyAnswer:''}
+	componentDidMount(){
+		$.get('collect.php',{count:localStorage.count},data=>{
+			if(parse(data)){
+				l(data)
+				var MyAnswer=p(data).map(ans=>
+				<div>
+					<li onClick={this.props.question}>{ans.question}</li>
+					<li>{ans.answer}</li>
+					<li>{ans.agree}次赞同</li>
+				</div>)
+				this.setState({MyAnswer})
+			}
+		})
+	}	
+	render() {
+		return (
+			<div className='MyAnswer'>
+				{this.state.MyAnswer}
+			</div>
+		)
+    }
+}
+class MyAnswer extends React.Component{
+	state={MyAnswer:''}
+	componentDidMount(){
+		$.get('myAnswer.php',{count:localStorage.count},data=>{
+			if(parse(data) != ''){
+				l(data)
+				var MyAnswer=p(data).map(ans=>
+				<div>
+					<li onClick={this.props.question}>{ans.question}</li>
+					<li>{ans.answer}</li>
+					<li>{ans.agree}次赞同</li>
+				</div>)
+				this.setState({MyAnswer})
+			}	
+		})
+	}	
+	render() {
+		return (
+			<div className='MyAnswer'>
+				{this.state.MyAnswer}
+			</div>
+		)
+    }
+}
+class Shows extends React.Component{
+	state={display:'none'}
+	show=()=>this.setState({display:'block'})
+	quit=()=>this.setState({display:'none'})
+	reply=(e,replyd)=>{
+		var reply=$(e.target).prev().val()
+		if(reply){
+			let [pid,replyer]=[this.props.id,localStorage.count]
+			this.setState({display:'none'})
+			$.post('reply.php',{pid,replyer,replyd,reply})
+		}else{
+			alert('评论内容不能为空')
+		}	
+	}
+	render() {
+		return (
+			<div>
+				<li>
+					{this.props.d.replyer}回复{this.props.d.replyd}:
+					<span onClick={this.show}>{this.props.d.reply}</span>
+				</li>
+				<li className='reply' style={{display:this.state.display}}>
+					回复{this.props.d.replyer}<input />
+					<button onClick={e=>this.reply(e,this.props.d.replyer)}>回复</button>
+					<button onClick={this.quit}>取消</button>
+				</li>
+			</div>
+		)
+    }
+}	
+class Comments extends React.Component{	
+	state={display:'none',replys:'',show_replys:'',show:'回复'}
+	//回复评论	
+	show_reply=e=>{
+		if(e.target.innerHTML=='查看回复'){
+			$.get('reply.php',{pid:this.props.data.id},data=>{
+				this.setState({
+					show_replys:p(data).map(d=><Shows id={this.props.data.id} d={d}  />),
+					show:'收起回复' //这里没有渲染
+				})	
+			})
+		}else if(e.target.innerHTML=='回复'){
+			this.setState({
+			display:'block',
+			})
+		}else{
+			this.setState({
+				show_replys:'',
+				show:'查看回复'
+			})
+		}	
+	}
+	componentDidMount(){
+		$.get('reply.php',{pid:this.props.data.id},data=>{
+			parse(data) ? this.setState({show:'查看回复'}) : ''
+		})
+	}	
+	render() {
+		return (
+			<div style={{paddingTop:'10px'}}>
+				{this.props.data.commenter}<span onClick={this.show}>:{this.props.data.comment}</span>
+				<button onClick={this.show_reply}>{this.state.show}</button>
+				{this.state.show_replys}
+				<li className='reply' style={{display:this.state.display}}>
+					<input />
+					<button onClick={this.reply} >
+					回复
+					</button>
+					<button onClick={this.quit}>取消</button>
+				</li>
+			</div>
+		)
+    }
+}	
+class Ans extends React.Component{
+	state={
+		agree:this.props.ans.agree,
+		agreed:'',
+		commenter:'',
+		display:'none',
+		comments:'',
+		collect:'',
+	}
+	agree=(e,count,question,answer,agree,agreeer)=>{
+		$(e.target).css('color','blue')
+		if(e.target.innerHTML=='赞同'){ 
+			$.post('answer.php',{count,question,answer})
+			$.post('agree.php',{count,question,answer,agree,agreeer},data=>l(data))
+			this.setState({agree:parseInt(this.state.agree)+1,agreed:'已赞同'})
+		}else if(confirm('确定取消赞同吗?')){
+			this.setState({agree:parseInt(this.state.agree)-1,agreed:'赞同'})
+			$.post('agree.php',{count,question,answer,agreeer})
+		}		
+	}
+	//是否评论过
+	quit=()=>this.setState({display:'none'})
+	commenter=e=>{
+		if(e.target.innerHTML=='评论'){ 
+			this.setState({display:'block'})
+		}else if(e.target.innerHTML=='收起评论'){ 
+			this.setState({comments:'',commenter:'查看评论'})
+		}else{
+			//查看评论
+			$.get('comment.php',{question:this.props.ans.question,count:this.props.ans.count,
+				answer:this.props.ans.answer},data=>{
+				var comments=p(data).map(data=><Comments data={data}  />)
+				this.setState({comments,commenter:'收起评论'}) 
+			})
+			$.get('comment.php',{question:this.props.ans.question,count:this.props.ans.count,
+				answer:this.props.ans.answer,commenter:localStorage.count},data=>{
+				!data ? this.setState({display:'block'}) : l(data)
+			})
+		}		
+	}
+	//发表评论
+	comment=(e,count,question,answer,commenter)=>{
+		var comment=$(e.target).prev().val()
+		if(comment != ''){
+			$.post('comment.php',{count,question,answer,comment,commenter},data=>
+				$.get('comment.php',{question:this.props.ans.question,count:this.props.ans.count,
+					answer:this.props.ans.answer},data=>{
+					var comments=p(data).map(data=><Comments data={data}  />)
+					this.setState({display:'none',comments,commenter:'收起评论'}) 
+				})
+			)	
+		}else{
+			alert('评论内容不能为空')
+		}	
+	}
+	collect=(e,count,question,answer,agree,collecter)=>{
+		$(e.target).css('color','blue')
+		if(e.target.innerHTML=='收藏回答'){ 
+			$.post('collect.php',{count,question,answer,agree,collecter},data=>l(data))
+			this.setState({collect:'已收藏'})
+		}else if(confirm('确定取消收藏吗?')){
+			this.setState({collect:'收藏回答'})
+			$.post('collect.php',{count,question,answer,collecter})
+		}		
+	}
+	componentDidMount(){
+		$.get('agree.php',{question:this.props.ans.question,count:this.props.ans.count,
+			answer:this.props.ans.answer},data=>{
+			l(data)
+			data==''? this.setState({agreed:'赞同'}) : this.setState({agreed:'已赞同'})
+		})
+		$.get('comment.php',{question:this.props.ans.question,count:this.props.ans.count,
+			answer:this.props.ans.answer},data=>{
+			l(data)
+			data==''? this.setState({commenter:'评论'}) : this.setState({commenter:'查看评论'})
+		})
+		$.get('collect.php',{question:this.props.ans.question,count:this.props.ans.count,
+			answer:this.props.ans.answer},data=>{
+			l(data)
+			data==''? this.setState({collect:'收藏回答'}) : this.setState({collect:'已收藏'})
+		})
+	}	
+	render() {
+		return (
+			<div id='ans'>
+				<li>
+					<span style={{paddingRight:'5px'}}>用户:</span>
+					<span onClick={this.count}>{this.props.ans.count}</span>
+				</li>
+				<li className='ans'>{this.props.ans.answer}</li>
+				<li>
+					{this.state.agree}次
+					<button onClick={e=>this.agree(e,this.props.ans.count,
+						this.props.ans.question,this.props.ans.answer,
+						this.props.ans.agree,localStorage.count)}>{this.state.agreed}
+					</button>
+					<span style={{paddingLeft:'20px'}}>
+						<button onClick={e=>this.commenter(e)} >
+							{this.state.commenter}
+						</button>
+					</span>
+					<span style={{paddingLeft:'20px'}}>
+						<button onClick={e=>this.collect(e,this.props.ans.count,
+							localStorage.question,this.props.ans.answer,this.props.ans.agree,localStorage.count)} >
+							{this.state.collect}
+						</button>
+					</span>
+				</li>
+				{this.state.comments}
+				<li style={{display:this.state.display}}>
+					<input  id='comment'/>
+					<button onClick={e=>this.comment(e,this.props.ans.count,
+					localStorage.question,this.props.ans.answer,localStorage.count)} >
+					评论
+					</button>
+					<button onClick={this.quit}>取消</button>
+				</li>
+			</div>
+		)
+    }
+}
+class Answer extends React.Component{
+	state={answer:'',ans:''}
+	answer=()=>{
+		$.post('question.php',{count:localStorage.count,question:this.props.question,
+		answer:$('#answer').html()})
+		$.get('question.php',{question:this.props.question},data=>{
+			l(data)
+			var answer=p(data).map(ans=><Ans ans={ans} />)
+			this.setState({answer,ans:''})
+		})
+	}	
+	componentDidMount(){
+		$.get('question.php',{question:this.props.question},data=>{
+			var answer=p(data).map(ans=><Ans ans={ans} />)
+			this.setState({answer})
+		})
+		$.get('answer.php',{count:localStorage.count,question:this.props.question},data=>{
+			l(data)
+			data == '' && localStorage.count ? this.setState({ans:<div><div contentEditable='true' id='answer'></div><button onClick={this.answer}>回答</button></div>}) : l('data')
+		})	
+		
+	}	
+	render() {
+		return (
+			<div className='answer'>
+				<li style={{paddingTop:'20px'}}>{this.props.question}</li>
+				{this.state.answer}
+				{this.state.ans}
+			</div>
+		)
+    }
+}
+const Header=props=>d('header',li(props.data,props.Hclick))
+
+class List extends React.Component{
+	state={
+		load:li_p(this.props.data,this.props.question),
+		data:[]
+	}
+	load=e=>{
+		var question=$(e.target).parent().prev().html()
+		$.get('load.php',{question},data=>{
+			p(data).map(q=>this.state.data.push(q))
+			l(this.state.data)
+			this.setState({load:li_o(this.state.data,this.props.question)})
+		})
+	}
+	componentDidMount(){
+		p(this.props.data).map(q=>this.state.data.push(q))
+	}
+	render() {
+		return (
+			<div className='list'>
+				{this.state.load}
+				<li><button onClick={this.load}>加载更多</button></li>
+			</div>
+		)
+    }
+}
+class App extends React.Component{
+	state={
+		header:localStorage.count ? ['首页','提问','我的回答','我的提问','我的收藏','注销'] :  ['注册','登录'] ,
+		com:''
+	}	
+	login=e=>{
+		var [count,password]=[$('.count').val(),$('.password').val()]
+		if(count && password){
+			if(e.target.innerHTML=='注册'){
+				$.get('zhihu.php',{count,password},data=>{
+					data=='' ? $.post('zhihu.php',{count,password}) : alert('用户已存在')
+				})	
+			}else{ 	
+				$.get('zhihu.php',{count,password},data=>{
+					l(data)
+					if(!data){
+						alert('your count or password is wrong')
+						return 
+					}
+				})
+			}
+			localStorage.count=count
+			localStorage.password=password
+			location.reload()
+		}else{
+			alert('the count or password can not be empty.')	
+		}	
+	}
+	Hclick=e=>{
+		if(e.target.innerHTML=='首页') location.reload()
+		if(e.target.innerHTML=='注册') return this.setState({com:<Login value='注册' login={this.login} />})
+		if(e.target.innerHTML=='登录') return this.setState({com:<Login value='登录' login={this.login} />})
+		if(e.target.innerHTML=='提问') return this.setState({com:<Ask ask={this.ask} />})
+		if(e.target.innerHTML=='我的回答') return this.setState({com:<MyAnswer question={this.question}  />})
+		if(e.target.innerHTML=='我的提问') return $.get('myAsk.php',{count:localStorage.count},data=>{
+			this.setState({com:<List data={data} question={this.question} />})
+		})	
+		if(e.target.innerHTML=='我的收藏') return this.setState({com:<Mycollect question={this.question}  />})
+		if(e.target.innerHTML=='注销') localStorage.count='' 
+		location.reload()
+		
+	}
+	question=e=>{
+		if(!localStorage.count){
+			alert('请先登录')
+		}else{	
+			localStorage.question=e.target.innerHTML
+			this.setState({com:<Answer question={e.target.innerHTML} />})
+		}	
+	}
+	componentDidMount(){
+		$.get('question.php',data=>{
+			this.setState({com:<List data={data} question={this.question}  />})
+		})	
+	}	
+	render() {
+		return (
+			<div className='app'>
+				<Header data={this.state.header} Hclick={this.Hclick} />
+				{this.state.com}
+			</div>
+		)
+    }
+}
+ReactDOM.render(
+  <App /> 
+  ,document.getElementById('app')
+)
+</script>

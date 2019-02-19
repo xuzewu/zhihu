@@ -1,0 +1,60 @@
+<meta charset=utf-8 />
+<style>
+.art{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-around;
+}	
+.title{
+	margin-left:40%;
+	width:20%;
+	border:1px solid;
+}   
+.quotation{
+	margin-left:40%;
+	width:20%;
+}
+.quotation input{
+	width:86%;
+}	
+.content{
+	margin-left:20%;
+	width:60%;
+	height:80%;
+	border:1px solid;
+	overflow:auto;
+}   
+.submit{
+	display:flex;
+	justify-content:center;
+	width:6%;
+	margin-left:47%;
+	background:#8470FF;
+	cursor:pointer;
+	color:white;
+}	
+</style>
+<link rel="stylesheet" href="creat.css" />
+<div class="art">
+	<div class="quotation" >
+		语录:<input />
+	</div>
+	<div class="title" contenteditable="true">
+	</div>
+	<div class="content" contenteditable="true">
+	</div>
+	<div class="submit">
+		发表
+	</div>
+</div>
+<script src=jq.js></script>
+<script>
+$('.submit').click(()=>{
+	$.post('index.php',{
+		title:$.trim($('.title').html()),
+		content:$('.content').html().replace(/div/g,'p')
+	},d=>console.log(d))
+	location.href='index.html'
+})	
+</script>

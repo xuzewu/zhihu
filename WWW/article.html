@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+<body>
+<div id='app'>
+</div>
+</body>
+<style>
+body,li{
+	margin:0;
+	list-style-type:none;
+	cursor:pointer;
+}
+.app{
+	height:100%;
+  margin:0 auto;
+}	
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.login , .list{
+	margin-top:10%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}	
+</style>
+<script src=jq.js></script>
+<script type="text/babel">
+const l=console.log
+const li=(data,event)=>data.map(l=><li onClick={event}>{l}</li>)
+class Login extends React.Component{
+	render() {
+		return (
+			<div className='login'>
+				<li>账号:<input /></li>
+				<li>密码:<input /></li>
+				<li><button>{this.props.value}</button></li>
+			</div>
+		)
+    }
+}
+class Header extends React.Component{
+	render() {
+		return (
+			<div className='header'>
+				{li(this.props.data,this.props.Hclick)}
+			</div>
+		)
+    }
+}
+class List extends React.Component{
+	render() {
+		return (
+			<div className='list'>
+				{li(this.props.data,this.props.Lclick)}
+			</div>
+		)
+    }
+}
+
+class App extends React.Component{
+	state={
+		header:localStorage.name ? ['我的收藏','我的发布'] : ['注册','登录'],
+		com:''
+	}	
+	Hclick=()=>{
+		this.setState({com:<Login value='注册' />})
+	}
+	Aclick=()=>{
+		l(5)
+	}
+	Lclick=()=>{
+		this.setState({com:<List data={[4,5,6]} Lclick={this.Aclick} />})
+	}
+	componentDidMount(){
+		this.setState({com:<List data={[1,2,3]} Lclick={this.Lclick} />})
+	}	
+	render() {
+		return (
+			<div className='app'>
+				<Header data={this.state.header} Hclick={this.Hclick} />
+				{this.state.com}
+			</div>
+		)
+    }
+}
+ReactDOM.render(
+  <App /> 
+  ,document.getElementById('app')
+)
+</script>

@@ -1,0 +1,77 @@
+<meta charset=utf-8 />
+<style>
+body{margin:0}
+span{display:inline-block;cursor:pointer}
+.all{height:100%;display:flex;flex-direction:column;justify-content:space-between;}
+.body{display:flex;flex-direction:column;align-items:center;}
+.body .form{display:flex;flex-direction:column;}
+.body .form div{margin-bottom:10;display:flex; align-items:center;}
+.body .form div span{margin-right:10}
+.bottom{display:flex;justify-content:space-around;align-items:center;height:60;border-top:solid ; border-top-color:#999}
+.bottom span{display:flex;flex-direction:column;color:#999}
+.upload a{color:blue}
+.bottom span img{height:30;width:30}
+.picture{display:flex;justify-content:center;align-items:center;width:200;height:100;border:1px solid}
+input{border-radius:25px;}
+.address{width:300;height:100}
+.describe{width:300;height:50} 
+</style>
+<body>
+	<div class=all>
+		<div class=body>
+			<div class=form>
+				<div><span>物品图片</span><span class=picture>+</span></div>
+				<div>
+					<span>物品分类:</span>
+					<select>
+					  <option >衣服</option>
+					  <option >裤子</option>
+					  <option >书本</option>
+					  <option >背包</option>
+					    <option>其它</option>
+					</select>
+				</div>
+				<div><span>取货时间:</span><input type=time /></div>
+				<div><span>物品名称:</span><input /></div>
+				<div><span>物品描述:</span><input class=describe /></div>
+				<div><span>您的姓名:</span><input /></div>
+				<div><span>手机号码:</span><input /></div>
+				<div><span>地址:</span><input class=address /></div>
+				<div style='margin-left:100'>
+					<input type=button value='确定' style='margin-right:50' class=confirm />
+					<input type=button value='取消'/>
+				</div>
+			</div>
+			
+		</div>
+		<div class=bottom>
+			<span class=index>
+				<img src='img/index.jpg' />
+				<a>首页</a>
+			</span>
+			<span class=upload>
+				<img src='img/upload.jpg' />
+				<a>上传</a>
+			</span>
+			<span class=my>
+				<img src='img/user.png'/>
+				<a>我的</a>
+			</span>
+		</div>
+	</div>
+</body>
+<script src=jq.js></script>
+<script>
+$('.confirm').click(function(){
+	$('input').each(function(){
+		!$(this).val() ? empty=true : ''
+	})
+	typeof(empty)=='undefined' ? location.href = 'index.html' : alert('不能留空')
+})	
+$('.index').click(function(){
+	location.href = 'index.html'
+})		
+$('.my').on('click',function(){
+	location.href = 'my.html'
+})	
+</script>

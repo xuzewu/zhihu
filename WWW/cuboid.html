@@ -1,0 +1,42 @@
+<html>
+<head>
+<script type="text/javascript" src="jq.js"></script>
+</head>
+<style>
+.body{margin:0}
+</style>
+<div class=flex>
+<canvas id=my  ></canvas>
+</div> 
+<script src=jq.js></script>
+<script type="text/javascript">
+function cuboid(x,y,z,width=3000,height=1000){
+	var c=document.getElementById("my");
+	var cxt=c.getContext("2d");
+	$('canvas').attr('width',width)
+	$('canvas').attr('height',height)
+	cxt.moveTo(0,0);
+	cxt.lineTo(x,0);
+	cxt.lineTo(z.x+x,z.y);
+	cxt.lineTo(z.x,z.y);
+	cxt.lineTo(0,0);
+	cxt.lineTo(0,y)
+	cxt.lineTo(z.x,z.y+y);
+	cxt.lineTo(z.x,z.y);
+	cxt.moveTo(z.x+x,z.y);
+	cxt.lineTo(z.x+x,z.y+y);
+	cxt.lineTo(z.x,z.y+y);
+	cxt.moveTo(0,y);
+	cxt.lineTo(0+x,y);
+	cxt.lineTo(z.x+x,z.y+y);
+	cxt.moveTo(0+x,y);
+	cxt.lineTo(x,0);
+	cxt.stroke();
+}	
+x=200
+y=100
+z={x:100,y:50}
+$(document).mousemove(function(e){  
+  cuboid(e.pageX,e.pageY,z)
+});
+</script>

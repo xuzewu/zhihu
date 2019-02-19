@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<meta charset="UTF-8" />
+<title>Hello React!</title>
+<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<style>
+body{
+	margin:0;
+}
+li{
+  list-style-type:none;
+  cursor:pointer;
+}		
+.app{
+  color:#C6E2FF;
+  background:url(img/scene.jpg) no-repeat;
+  background-size:100% 100%;
+}
+.header{
+  display:flex;
+  justify-content:space-around;
+}
+.perform{
+	width:100%;
+	height:100%;
+}
+.article{
+	display:flex;
+}
+.left{
+  width:10%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content:space-around;
+  overflow:auto;
+} 
+.right{
+	width:50%;
+	margin-left:15%;
+	flex-direction:column;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	color:#EEE0E5;
+}
+#yulu{
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	justify-content:center;
+}		
+.yulu{
+	height:50%;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	flex-wrap:wrap;
+	color:#EEE0E5;
+}
+ .creat{
+	display:flex;
+}		
+</style>
+<link rel='stylesheet' href='e.css' />
+<div id='app'>
+
+</div>
+<script src=jq.js></script>
+<script type="text/babel">
+const p=JSON.parse
+const parse=data=>JSON.parse(data)[0][0]
+const div=(clas,data)=>data ? <div className={clas}>{data}</div> : <div className={clas}></div> 
+const div_m=(clas,data,)=>data ? <div className={clas}>{data.map(l=>l)}</div> : <div className={clas}></div> 
+const li=(data,event)=>data.map(l=><li onClick={event}>{l}</li>)
+const li_p=(data,event)=>p(data).map(l=><li onClick={event}>{l[0]}</li>)
+class Content extends React.Component{
+	render() {
+		return (
+			<div className='content' onClick={this.props.content}>
+				{this.props.data}
+			</div>
+		)
+    }
+}
+
+class Article extends React.Component{
+	state={com:''}	
+	componentDidMount() {
+		if(typeof(window.title)=='undefined'){
+			$('.left').children(':first').click()
+		}else{	
+			$('.left').children().each(function(){
+				$(this).html()==window.title ? $(this).click() : ''
+			})	
+		}	
+	}	
+	click=e=>{
+		$(e.target).css({color:'white'}).siblings().css({color:''})
+		window.title=e.target.innerHTML
+		$.get('index.php?title='+window.title,data=>this.setState({com:<Content data={parse(data)} content={this.content}/>}))
+	}	
+	content=e=>this.setState({com:<div>hello</div>})
+	render() {
+		return (
+			<div className='article'>
+				<div className='left'>
+				{li_p(this.props.data,this.click)}
+				</div>
+				{this.state.com}
+			</div>
+		)
+    }
+}
+class Yulu extends React.Component{	
+	juzi=''
+	 render() {
+		return (
+			<div id='yulu'>
+				<div className='yulu'>
+					{p(this.props.data).map(l=>{
+							this.juzi+=l.sentence.split('').map(l=>'<li>'+l+'</li>')
+							//for(let i=0;i<l.sentence.length;i++) this.juzi+='<li>'+l.sentence[i]+'</li>'
+						}
+					)}
+					{this.juzi}
+				</div>
+			</div>	
+		)
+    }
+}
+class App extends React.Component{	
+	state={}
+	click=e=>{
+		$(e.target).css({color:'white'}).siblings().css({color:''})
+		var topic=e.target.innerHTML
+		if(topic=='文集') 
+
+			$.get('index.php?topic='+topic,data=>{
+				this.setState({
+				  com:<Article data={data} click={this.article} /> 
+				})
+			})
+			
+		if(topic=='语录') $.get('index.php?topic='+topic,data=>{
+			this.setState({
+			  com:<Yulu data={data} /> 
+			});
+		})
+	}
+	
+	componentDidMount() {
+		$('.header').children(':first').click()
+	}	
+    render() {
+		return (
+			<div className='app'>
+				<div className='header'>
+					{li(['文集','语录','创作'],this.click)}
+				</div>
+				<div className='perform'>
+					{this.state.com}
+				</div>
+			</div>	
+		)
+    }
+}
+ReactDOM.render(
+  <App /> 
+  ,document.getElementById('app')
+)
+</script>
+ 
